@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://buy80utypuou"]
 
 [ext_resource type="Script" uid="uid://dmaxi1uy8fvai" path="res://motorcycle_raycast.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://ddyyyl2p2uqvi" path="res://wheel_raycast.gd" id="2_0xm2m"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bais7"]
 size = Vector3(50, 1, 50)
@@ -21,6 +22,8 @@ size = Vector3(2, 0.5, 0.25)
 [sub_resource type="BoxShape3D" id="BoxShape3D_yqcxb"]
 size = Vector3(1, 0.5, 2)
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_bais7"]
+
 [sub_resource type="Environment" id="Environment_d4f1g"]
 background_mode = 1
 background_color = Color(0.6783694, 0.761581, 0.95033807, 1)
@@ -39,26 +42,41 @@ shape = SubResource("BoxShape3D_bais7")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Platform" unique_id=1706107414]
 mesh = SubResource("BoxMesh_bais7")
 
-[node name="RigidBody3D" type="RigidBody3D" parent="." unique_id=2126663701 node_paths=PackedStringArray("wheels")]
+[node name="Motorcycle" type="RigidBody3D" parent="." unique_id=2126663701 node_paths=PackedStringArray("wheels")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mass = 30.0
 script = ExtResource("1_ig7tw")
 wheels = [NodePath("Wheel1"), NodePath("Wheel2")]
 
-[node name="MainBody" type="MeshInstance3D" parent="RigidBody3D" unique_id=787357072]
+[node name="MainBody" type="MeshInstance3D" parent="Motorcycle" unique_id=787357072]
 mesh = SubResource("BoxMesh_rvawr")
 
-[node name="SteeringWheel" type="MeshInstance3D" parent="RigidBody3D" unique_id=735234106]
+[node name="SteeringWheel" type="MeshInstance3D" parent="Motorcycle" unique_id=735234106]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.875)
 mesh = SubResource("BoxMesh_7dm0k")
 
-[node name="MainBodyCollision" type="CollisionShape3D" parent="RigidBody3D" unique_id=1676933477]
+[node name="MainBodyCollision" type="CollisionShape3D" parent="Motorcycle" unique_id=1676933477]
 shape = SubResource("BoxShape3D_yqcxb")
 
-[node name="Wheel1" type="RayCast3D" parent="RigidBody3D" unique_id=731055372]
+[node name="Wheel1" type="RayCast3D" parent="Motorcycle" unique_id=731055372]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.5)
+script = ExtResource("2_0xm2m")
+spring_strength = 3000.0
+spring_damping = 30.0
 
-[node name="Wheel2" type="RayCast3D" parent="RigidBody3D" unique_id=1847072445]
+[node name="WheelMesh" type="MeshInstance3D" parent="Motorcycle/Wheel1" unique_id=725062714]
+transform = Transform3D(-4.3711385e-08, -0.19999999, 0, 0.99999994, -8.742277e-09, 0, 0, 0, 1, 0, -0.5, 0)
+mesh = SubResource("CylinderMesh_bais7")
+
+[node name="Wheel2" type="RayCast3D" parent="Motorcycle" unique_id=1847072445]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.5)
+script = ExtResource("2_0xm2m")
+spring_strength = 3000.0
+spring_damping = 30.0
+
+[node name="WheelMesh" type="MeshInstance3D" parent="Motorcycle/Wheel2" unique_id=1904386090]
+transform = Transform3D(-4.3711385e-08, -0.19999999, 0, 0.99999994, -8.742277e-09, 0, 0, 0, 1, 0, -0.5, 0)
+mesh = SubResource("CylinderMesh_bais7")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1930333086]
 environment = SubResource("Environment_d4f1g")
