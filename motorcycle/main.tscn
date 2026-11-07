@@ -80,6 +80,7 @@ enabled = false
 script = ExtResource("2_0xm2m")
 spring_strength = 3000.0
 spring_damping = 30.0
+over_extend = 0.2
 
 [node name="WheelMesh" type="MeshInstance3D" parent="Motorcycle/Wheel1" unique_id=725062714]
 transform = Transform3D(-4.3711385e-08, -0.19999999, 0, 0.99999994, -8.742277e-09, 0, 0, 0, 1, 0, -0.5, 0)
@@ -91,6 +92,7 @@ enabled = false
 script = ExtResource("2_0xm2m")
 spring_strength = 3000.0
 spring_damping = 30.0
+over_extend = 0.2
 is_motor = true
 
 [node name="WheelMesh" type="MeshInstance3D" parent="Motorcycle/Wheel2" unique_id=1904386090]
