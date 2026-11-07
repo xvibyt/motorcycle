@@ -4,14 +4,18 @@
 [ext_resource type="Script" uid="uid://ddyyyl2p2uqvi" path="res://wheel_raycast.gd" id="2_0xm2m"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bais7"]
-size = Vector3(50, 1, 50)
+size = Vector3(50, 1, 5000)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7dm0k"]
 albedo_color = Color(0.3665946, 0.3665946, 0.36659458, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_bais7"]
 material = SubResource("StandardMaterial3D_7dm0k")
-size = Vector3(50, 1, 50)
+size = Vector3(50, 1, 5000)
+
+[sub_resource type="Curve" id="Curve_0xm2m"]
+_data = [Vector2(0, 0.24719107), 0.0, 0.0, 0, 0, Vector2(0.24553573, 1), 0.0, 0.0, 0, 0, Vector2(0.7544643, 0.75280905), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
 
 [sub_resource type="BoxMesh" id="BoxMesh_rvawr"]
 size = Vector3(1, 0.5, 2)
@@ -24,12 +28,20 @@ size = Vector3(1, 0.5, 2)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_bais7"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
+
 [sub_resource type="Environment" id="Environment_d4f1g"]
 background_mode = 1
 background_color = Color(0.6783694, 0.761581, 0.95033807, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.90359825, 0.90359825, 0.9035982, 1)
 ambient_light_energy = 3.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d4f1g"]
+size = Vector3(10, 10, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_d4f1g"]
+size = Vector3(10, 10, 10)
 
 [node name="Node3D" type="Node3D" unique_id=6327640]
 
@@ -47,9 +59,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mass = 30.0
 script = ExtResource("1_ig7tw")
 wheels = [NodePath("Wheel1"), NodePath("Wheel2")]
+acc_curve = SubResource("Curve_0xm2m")
 
 [node name="MainBody" type="MeshInstance3D" parent="Motorcycle" unique_id=787357072]
 mesh = SubResource("BoxMesh_rvawr")
+
+[node name="Camera3D" type="Camera3D" parent="Motorcycle/MainBody" unique_id=290659557]
+transform = Transform3D(0.8660254, 1.4901159e-08, -0.5, 0, 1, 2.9802319e-08, 0.5, -2.5809564e-08, 0.8660254, -2, 1, 4)
 
 [node name="SteeringWheel" type="MeshInstance3D" parent="Motorcycle" unique_id=735234106]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.875)
@@ -60,6 +76,7 @@ shape = SubResource("BoxShape3D_yqcxb")
 
 [node name="Wheel1" type="RayCast3D" parent="Motorcycle" unique_id=731055372]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.5)
+enabled = false
 script = ExtResource("2_0xm2m")
 spring_strength = 3000.0
 spring_damping = 30.0
@@ -70,19 +87,31 @@ mesh = SubResource("CylinderMesh_bais7")
 
 [node name="Wheel2" type="RayCast3D" parent="Motorcycle" unique_id=1847072445]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.5)
+enabled = false
 script = ExtResource("2_0xm2m")
 spring_strength = 3000.0
 spring_damping = 30.0
+is_motor = true
 
 [node name="WheelMesh" type="MeshInstance3D" parent="Motorcycle/Wheel2" unique_id=1904386090]
 transform = Transform3D(-4.3711385e-08, -0.19999999, 0, 0.99999994, -8.742277e-09, 0, 0, 0, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_bais7")
 
+[node name="WheelMesh2" type="MeshInstance3D" parent="Motorcycle/Wheel2/WheelMesh" unique_id=473503830]
+transform = Transform3D(0.9999999, 0, 0, -2.842171e-14, 0.9999999, 0, 0, 0, 0.9999999, 0, -0.45348406, 0)
+mesh = SubResource("BoxMesh_0xm2m")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1930333086]
 environment = SubResource("Environment_d4f1g")
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=290659557]
-transform = Transform3D(1, 0, 0, 0, 1, 2.9802319e-08, 0, -2.9802319e-08, 1, 0, 0, 4)
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1261956217]
 transform = Transform3D(0.7071067, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.7071067, 0, 0, 2.138185)
+
+[node name="Ramp" type="StaticBody3D" parent="." unique_id=2070269318]
+transform = Transform3D(1, 0, 0, 0, 0.8660254, -0.5, 0, 0.5, 0.8660254, 0, -4, -48)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ramp" unique_id=1073132268]
+shape = SubResource("BoxShape3D_d4f1g")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ramp" unique_id=2079223069]
+mesh = SubResource("BoxMesh_d4f1g")

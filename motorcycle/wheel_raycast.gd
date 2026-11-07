@@ -6,5 +6,6 @@ class_name RaycastWheel
 @export var rest_dis := 0.5
 @export var over_extend := 0.0
 @export var wheel_rad := 0.5
+@export var is_motor := false
 
 @onready var wheel: Node3D = $WheelMesh
