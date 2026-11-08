@@ -10,6 +10,12 @@ extends RigidBody3D
 
 @export var skid_marks: Array[GPUParticles3D]
 
+@export var Camera: Camera3D
+@export var CamTarget: Node3D
+@export var cam_speed := 9.0
+@export var drift_cam_speed := 11.0
+var cur_cam_speed := cam_speed
+
 var motor_input := 0.0
 var handbreak := false
 var is_slipping := false
@@ -40,6 +46,12 @@ func _unhandled_input(event: InputEvent):
 
 func _physics_process(delta: float) -> void:
 	#printt(linear_velocity)
+	
+	Camera.global_position = Camera.global_position.move_toward(CamTarget.global_position, delta * cur_cam_speed)
+	var w := 1.0 - exp(-8.0 * delta)
+	var look_dir := (global_position + Vector3.UP * 1.0) - Camera.global_position
+	var look_basis := Basis.looking_at(look_dir, Vector3.UP)
+	Camera.global_basis = Camera.global_basis.orthonormalized().slerp(look_basis, w)
 	
 	_steering_rotation(delta)
 	var grounded := false
@@ -87,13 +99,16 @@ func _do_single_wheel_traction(ray: RaycastWheel, idx: int):
 	if not handbreak and grip_factor < 0.2:
 		is_slipping = false
 		skid_marks[idx].emitting = false
+		cur_cam_speed = cam_speed
 	
 	if handbreak:
 		x_traction = 0.1
 		if not skid_marks[idx].emitting:
 			skid_marks[idx].emitting = true
+		cur_cam_speed = drift_cam_speed
 	elif is_slipping:
 		x_traction = 0.1
+		cur_cam_speed = drift_cam_speed
 	
 	var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 	var x_force := -steer_side_dir * steer_x_vel * x_traction * ((mass * gravity) / 2.0) # realistic
