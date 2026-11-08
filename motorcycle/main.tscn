@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://buy80utypuou"]
 
-[ext_resource type="Script" uid="uid://dmaxi1uy8fvai" path="res://motorcycle_raycast.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://dmaxi1uy8fvai" path="res://motorcycle.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://ddyyyl2p2uqvi" path="res://wheel_raycast.gd" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://djraegpesoyma" path="res://zombie.gd" id="3_h2yge"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bais7"]
 size = Vector3(50, 1, 5000)
@@ -76,6 +77,28 @@ size = Vector3(1, 1, 0.25)
 [sub_resource type="BoxShape3D" id="BoxShape3D_l2rs2"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_ggd5q"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ggd5q"]
+size = Vector3(1, 1, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_l2rs2"]
+size = Vector3(1, 1, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0xm2m"]
+size = Vector3(0.4, 1, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_h2yge"]
+size = Vector3(0.4, 1, 0.4)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_bais7"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_d4f1g"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hcbcd"]
+size = Vector3(0.4, 0.1, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hcbcd"]
+size = Vector3(0.4, 0.1, 0.4)
 
 [node name="Node3D" type="Node3D" unique_id=6327640]
 
@@ -195,3 +218,127 @@ shape = SubResource("BoxShape3D_l2rs2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D" unique_id=1759691695]
 mesh = SubResource("BoxMesh_ggd5q")
+
+[node name="Zombie" type="RigidBody3D" parent="." unique_id=1136520488 node_paths=PackedStringArray("LeftLeg", "RightLeg", "LeftFoot", "RightFoot", "Torso")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -5)
+script = ExtResource("3_h2yge")
+LeftLeg = NodePath("LeftLeg")
+RightLeg = NodePath("RightLeg")
+LeftFoot = NodePath("LeftFoot")
+RightFoot = NodePath("RightFoot")
+Torso = NodePath("CollisionShape3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zombie" unique_id=885529994]
+shape = SubResource("BoxShape3D_ggd5q")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zombie" unique_id=1334840109]
+mesh = SubResource("BoxMesh_l2rs2")
+
+[node name="LeftLeg" type="RigidBody3D" parent="Zombie" unique_id=2004227027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, -1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zombie/LeftLeg" unique_id=2091692007]
+shape = SubResource("BoxShape3D_0xm2m")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zombie/LeftLeg" unique_id=972501327]
+mesh = SubResource("BoxMesh_h2yge")
+
+[node name="ConeTwistJoint3D" type="ConeTwistJoint3D" parent="Zombie/LeftLeg" unique_id=759210443]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+node_a = NodePath("..")
+node_b = NodePath("../..")
+
+[node name="LeftArm" type="RigidBody3D" parent="Zombie" unique_id=94536949]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zombie/LeftArm" unique_id=100318681]
+shape = SubResource("BoxShape3D_0xm2m")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zombie/LeftArm" unique_id=1132858687]
+mesh = SubResource("BoxMesh_h2yge")
+
+[node name="HingeJoint3D" type="HingeJoint3D" parent="Zombie/LeftArm" unique_id=982919663]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.3, 0)
+node_a = NodePath("..")
+node_b = NodePath("../..")
+
+[node name="RightArm" type="RigidBody3D" parent="Zombie" unique_id=546048169]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zombie/RightArm" unique_id=1527964522]
+shape = SubResource("BoxShape3D_0xm2m")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zombie/RightArm" unique_id=1211332282]
+mesh = SubResource("BoxMesh_h2yge")
+
+[node name="HingeJoint3D" type="HingeJoint3D" parent="Zombie/RightArm" unique_id=1923404591]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.3, 0)
+node_a = NodePath("..")
+node_b = NodePath("../..")
+
+[node name="RightLeg" type="RigidBody3D" parent="Zombie" unique_id=435045490]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, -1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zombie/RightLeg" unique_id=439835939]
+shape = SubResource("BoxShape3D_0xm2m")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zombie/RightLeg" unique_id=1234410254]
+mesh = SubResource("BoxMesh_h2yge")
+
+[node name="ConeTwistJoint3D" type="ConeTwistJoint3D" parent="Zombie/RightLeg" unique_id=928433397]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+node_a = NodePath("..")
+node_b = NodePath("../..")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="Zombie" unique_id=1800731934]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zombie/RigidBody3D" unique_id=1430226084]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zombie/RigidBody3D" unique_id=1606264419]
+
+[node name="Head" type="RigidBody3D" parent="Zombie" unique_id=2024369658]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zombie/Head" unique_id=144210141]
+shape = SubResource("SphereShape3D_bais7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zombie/Head" unique_id=862261026]
+mesh = SubResource("SphereMesh_d4f1g")
+
+[node name="HingeJoint3D" type="HingeJoint3D" parent="Zombie/Head" unique_id=1383940626]
+node_a = NodePath("..")
+node_b = NodePath("../..")
+
+[node name="RightFoot" type="RigidBody3D" parent="Zombie" unique_id=1080411573]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, -1.55, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zombie/RightFoot" unique_id=456842923]
+shape = SubResource("BoxShape3D_hcbcd")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zombie/RightFoot" unique_id=615090321]
+mesh = SubResource("BoxMesh_hcbcd")
+
+[node name="PinJoint3D" type="PinJoint3D" parent="Zombie/RightFoot" unique_id=960665511]
+node_a = NodePath("..")
+node_b = NodePath("../../RightLeg")
+
+[node name="LeftFoot" type="RigidBody3D" parent="Zombie" unique_id=1813704541]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, -1.55, 0)
+freeze = true
+freeze_mode = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zombie/LeftFoot" unique_id=1166510396]
+shape = SubResource("BoxShape3D_hcbcd")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Zombie/LeftFoot" unique_id=994633600]
+mesh = SubResource("BoxMesh_hcbcd")
+
+[node name="PinJoint3D" type="PinJoint3D" parent="Zombie/LeftFoot" unique_id=538371931]
+node_a = NodePath("..")
+node_b = NodePath("../../LeftLeg")
+
+[node name="LeftTarget" type="Node3D" parent="Zombie" unique_id=886507738]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.25, -1.55, 1)
+
+[node name="RightTarget" type="Node3D" parent="Zombie" unique_id=2098487903]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25, -1.55, 1)
