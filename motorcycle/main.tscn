@@ -26,9 +26,33 @@ size = Vector3(2, 0.5, 0.25)
 [sub_resource type="BoxShape3D" id="BoxShape3D_yqcxb"]
 size = Vector3(1, 0.5, 2)
 
+[sub_resource type="Curve" id="Curve_h2yge"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0.1), 0.0, 0.0, 0, 0]
+point_count = 3
+metadata/_snap_enabled = true
+
 [sub_resource type="CylinderMesh" id="CylinderMesh_bais7"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
+
+[sub_resource type="Gradient" id="Gradient_0xm2m"]
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_rvawr"]
+gradient = SubResource("Gradient_0xm2m")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_yqcxb"]
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_rvawr")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d4f1g"]
+transparency = 1
+vertex_color_use_as_albedo = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_bais7"]
+material = SubResource("StandardMaterial3D_d4f1g")
+size = Vector2(0.5, 0.5)
+orientation = 1
 
 [sub_resource type="Environment" id="Environment_d4f1g"]
 background_mode = 1
@@ -43,6 +67,12 @@ size = Vector3(10, 10, 10)
 [sub_resource type="BoxMesh" id="BoxMesh_d4f1g"]
 size = Vector3(10, 10, 10)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_rvawr"]
+size = Vector3(1, 1, 0.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yqcxb"]
+size = Vector3(1, 1, 0.25)
+
 [node name="Node3D" type="Node3D" unique_id=6327640]
 
 [node name="Platform" type="StaticBody3D" parent="." unique_id=1359818997]
@@ -54,12 +84,12 @@ shape = SubResource("BoxShape3D_bais7")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Platform" unique_id=1706107414]
 mesh = SubResource("BoxMesh_bais7")
 
-[node name="Motorcycle" type="RigidBody3D" parent="." unique_id=2126663701 node_paths=PackedStringArray("wheels")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="Motorcycle" type="RigidBody3D" parent="." unique_id=2126663701 node_paths=PackedStringArray("wheels", "skid_marks")]
 mass = 30.0
 script = ExtResource("1_ig7tw")
 wheels = [NodePath("Wheel1"), NodePath("Wheel2")]
 acc_curve = SubResource("Curve_0xm2m")
+skid_marks = [NodePath("SkidMarks/GPUParticles3D"), NodePath("SkidMarks/GPUParticles3D2")]
 
 [node name="MainBody" type="MeshInstance3D" parent="Motorcycle" unique_id=787357072]
 mesh = SubResource("BoxMesh_rvawr")
@@ -81,6 +111,7 @@ script = ExtResource("2_0xm2m")
 spring_strength = 3000.0
 spring_damping = 30.0
 over_extend = 0.2
+grip_curve = SubResource("Curve_h2yge")
 
 [node name="WheelMesh" type="MeshInstance3D" parent="Motorcycle/Wheel1" unique_id=725062714]
 transform = Transform3D(-4.3711385e-08, -0.19999999, 0, 0.99999994, -8.742277e-09, 0, 0, 0, 1, 0, -0.5, 0)
@@ -94,6 +125,7 @@ spring_strength = 3000.0
 spring_damping = 30.0
 over_extend = 0.2
 is_motor = true
+grip_curve = SubResource("Curve_h2yge")
 
 [node name="WheelMesh" type="MeshInstance3D" parent="Motorcycle/Wheel2" unique_id=1904386090]
 transform = Transform3D(-4.3711385e-08, -0.19999999, 0, 0.99999994, -8.742277e-09, 0, 0, 0, 1, 0, -0.5, 0)
@@ -102,6 +134,24 @@ mesh = SubResource("CylinderMesh_bais7")
 [node name="WheelMesh2" type="MeshInstance3D" parent="Motorcycle/Wheel2/WheelMesh" unique_id=473503830]
 transform = Transform3D(0.9999999, 0, 0, -2.842171e-14, 0.9999999, 0, 0, 0, 0.9999999, 0, -0.45348406, 0)
 mesh = SubResource("BoxMesh_0xm2m")
+
+[node name="SkidMarks" type="Node3D" parent="Motorcycle" unique_id=2050040855]
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="Motorcycle/SkidMarks" unique_id=1627903695]
+emitting = false
+amount = 200
+lifetime = 2.0
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_yqcxb")
+draw_pass_1 = SubResource("QuadMesh_bais7")
+
+[node name="GPUParticles3D2" type="GPUParticles3D" parent="Motorcycle/SkidMarks" unique_id=1199027021]
+emitting = false
+amount = 200
+lifetime = 2.0
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_yqcxb")
+draw_pass_1 = SubResource("QuadMesh_bais7")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1930333086]
 environment = SubResource("Environment_d4f1g")
@@ -117,3 +167,12 @@ shape = SubResource("BoxShape3D_d4f1g")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ramp" unique_id=2079223069]
 mesh = SubResource("BoxMesh_d4f1g")
+
+[node name="Test" type="StaticBody3D" parent="." unique_id=1543023414]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.5714335, -10)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Test" unique_id=814181681]
+shape = SubResource("BoxShape3D_rvawr")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Test" unique_id=1316273896]
+mesh = SubResource("BoxMesh_yqcxb")

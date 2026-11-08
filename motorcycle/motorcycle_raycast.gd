@@ -8,33 +8,50 @@ extends RigidBody3D
 @export var tire_turn_speed := 1.0
 @export var tire_max_turn_degrees := 30
 
+@export var skid_marks: Array[GPUParticles3D]
+
 var motor_input := 0.0
+var handbreak := false
+var is_slipping := false
 
 
 func _unhandled_input(event: InputEvent):
+	if event.is_action_pressed("Handbreak"):
+		handbreak = true
+		is_slipping = true
+	elif event.is_action_released("Handbreak"):
+		handbreak = false
+	
 	#motor_input = event.get_action_strength("Forwards") - event.get_action_strength("Backwards")
 	if event.is_action_pressed("Forwards"):
 		motor_input = 1
+		printt("Forwards pressed", motor_input)
 	elif event.is_action_released("Forwards"):
 		motor_input = 0
+		printt("Forwards released", motor_input)
 	
 	if event.is_action_pressed("Backwards"):
 		motor_input = -1
+		printt("Backwards pressed", motor_input)
 	elif event.is_action_released("Backwards"):
 		motor_input = 0
+		printt("Backwards released", motor_input)
 
 
 func _physics_process(delta: float) -> void:
-	print(linear_velocity)
+	#printt(linear_velocity)
+	
 	_steering_rotation(delta)
 	var grounded := false
+	var id := 0
 	for wheel in wheels:
 		if wheel.is_colliding():
 			grounded = true
 		wheel.force_raycast_update()
 		_do_single_wheel_suspension(wheel)
 		_do_single_wheel_acceleration(wheel)
-		_do_single_wheel_rotation(wheel)
+		_do_single_wheel_traction(wheel, id)
+		id += 1
 	
 	if grounded:
 		#center_of_mass = Vector3.ZERO
@@ -45,10 +62,8 @@ func _physics_process(delta: float) -> void:
 		center_of_mass = Vector3.DOWN * 1
 
 
-
 func _steering_rotation(delta: float) -> void:
 	var turn_input := Input.get_axis("Right", "Left") * tire_turn_speed
-	
 	if turn_input:
 		$Wheel1.rotation.y = clampf($Wheel1.rotation.y + turn_input * delta, 
 			deg_to_rad(-tire_max_turn_degrees), deg_to_rad(tire_max_turn_degrees))
@@ -56,18 +71,43 @@ func _steering_rotation(delta: float) -> void:
 		$Wheel1.rotation.y = move_toward($Wheel1.rotation.y, 0, tire_turn_speed * delta)
 
 
-func _do_single_wheel_rotation(ray: RaycastWheel):
+func _do_single_wheel_traction(ray: RaycastWheel, idx: int):
 	if not ray.is_colliding(): return
 	
 	var steer_side_dir := ray.global_basis.x
 	var tire_vel := _get_point_velocity(ray.wheel.global_position)
 	var steer_x_vel := steer_side_dir.dot(tire_vel)
-	var x_traction := 1.0
+	
+	var grip_factor := absf(steer_x_vel/tire_vel.length())
+	var x_traction := ray.grip_curve.sample_baked(grip_factor)
+	
+	skid_marks[idx].global_position = ray.get_collision_point() + Vector3.UP * 0.01
+	skid_marks[idx].look_at(skid_marks[idx].global_position + global_basis.z)
+	
+	if not handbreak and grip_factor < 0.2:
+		is_slipping = false
+		skid_marks[idx].emitting = false
+	
+	if handbreak:
+		x_traction = 0.1
+		if not skid_marks[idx].emitting:
+			skid_marks[idx].emitting = true
+	elif is_slipping:
+		x_traction = 0.1
+	
 	var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
-	var x_force := -steer_side_dir * steer_x_vel * x_traction * ((mass * gravity) / 2.0)
+	var x_force := -steer_side_dir * steer_x_vel * x_traction * ((mass * gravity) / 2.0) # realistic
+	#var x_force := -global_basis.x * steer_x_vel * x_traction * ((mass * gravity) / 2.0) # arcadish
+	
+	# BUG
+	var f_vel := -ray.global_basis.z.dot(tire_vel)
+	var z_traction := 0.05
+	var z_force := global_basis.z * f_vel * z_traction * ((mass * gravity) / 2.0) # less realistic
+	#var z_force := -ray.global_basis.z * f_vel * z_traction * ((mass * gravity) / 2.0) # more realistic
 	
 	var force_pos := ray.wheel.global_position - global_position
 	apply_force(x_force, force_pos)
+	apply_force(z_force, force_pos)
 
 
 func _do_single_wheel_acceleration(ray: RaycastWheel):
@@ -86,9 +126,6 @@ func _do_single_wheel_acceleration(ray: RaycastWheel):
 			var acc := acc_curve.sample_baked(speed_ratio)
 			var force_vector := forward_dir * acceleration * motor_input * acc
 			apply_force(force_vector, force_pos)
-		#elif abs(vel) > 10.05 and not motor_input:
-			#var drag_force_vector = global_basis.z * deceleration * signf(vel)
-			#apply_force(drag_force_vector, force_pos)
 
 
 func _get_spring_damp_force(ray: RaycastWheel, contact_pos: Vector3, spring_up_dir: Vector3) -> float:
@@ -104,10 +141,10 @@ func _do_single_wheel_suspension(ray: RaycastWheel) -> void:
 		ray.target_position.y = -(ray.rest_dis + ray.wheel_rad + ray.over_extend)
 		var contact_pos := ray.get_collision_point()
 		var spring_up_dir := ray.global_transform.basis.y
-		var spring_len := ray.global_position.distance_to(contact_pos) - ray.wheel_rad
+		var spring_len := maxf(0.0, ray.global_position.distance_to(contact_pos) - ray.wheel_rad)
 		var offset := ray.rest_dis - spring_len
 		
-		ray.wheel.position.y = -spring_len
+		ray.wheel.position.y = move_toward(ray.wheel.position.y, -spring_len, 5 * get_physics_process_delta_time())
 		
 		var spring_force := ray.spring_strength * offset
 		var spring_damp_force := _get_spring_damp_force(ray, contact_pos, spring_up_dir)
