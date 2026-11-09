@@ -11,8 +11,9 @@ I wanted to make a vehicle which is fun to drive. In the future I might use it a
 On itch.io:
 https://xvibyt.itch.io/motorcycle
 
-Or download the "motorcycle" folder in the repository:
-Click the import button inside Godot and select the project.
+Or if you want to load up the project files yourself:
+1. Download the "motorcycle" folder in this repository
+2. Click the import button inside Godot and select the project
 
 Controls:
 W: Accelerate
