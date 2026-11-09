@@ -7,7 +7,7 @@ Everything is scripted in GDScript inside of Godot.
 Why?
 I wanted to make a vehicle which is fun to drive. In the future I might use it as a base for other games with vehicles.
 
-# Test
+# Test it:
 On itch.io:
 https://xvibyt.itch.io/motorcycle
 
