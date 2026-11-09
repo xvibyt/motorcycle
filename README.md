@@ -2,7 +2,7 @@
 Currently a small prototype game about driving a motorcycle with semi-realistic physics.
 
 How?
-Everything is scripted in GDScript inside of Godot.
+Everything is scripted in GDScript inside of Godot. I used a tutorial to help me make a vehicle.
 
 Why?
 I wanted to make a vehicle which is fun to drive. In the future I might use it as a base for other games with vehicles.
